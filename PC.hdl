@@ -10,23 +10,14 @@
  * else              out(t+1) = out(t)
  */
 CHIP PC {
-    IN in[16], reset, load, inc;
+    IN in[16], load, inc, reset;
     OUT out[16];
-    
+
     PARTS:
-   
-    // 1. Increment the current output value
-    Inc16(in=prevOut, out=incOut);
-    
-    // 2. Select between keeping the current value or incrementing
-    Mux16(a=prevOut, b=incOut, sel=inc, out=mux1Out);
-    
-    // 3. Select whether to load the new input 'in'
-    Mux16(a=mux1Out, b=in, sel=load, out=mux2Out);
-    
-    // 4. Select whether to reset the counter to 0
-    Mux16(a=mux2Out, b=false, sel=reset, out=regIn);
-    
-    // 5. Store the value in the register and output it
-    Register(in=regIn, load=true, out=prevOut, out=out);
+    Inc16(in=current, out=incremented);
+    Mux16(a=current, b=incremented, sel=inc, out=afterInc);
+    Mux16(a=afterInc, b=in, sel=load, out=afterLoad);
+    Mux16(a=afterLoad, b=false, sel=reset, out=next);
+    Register(in=next, load=true, out=current);
+    Or16(a=current, b=false, out=out);
 }

@@ -8,13 +8,12 @@
  * Otherwise, the register maintains its current value:
  * if (load(t)) out(t+1) = in(t), else out(t+1) = out(t)
  */
+
 CHIP Bit {
     IN in, load;
     OUT out;
 
     PARTS:
-    Mux(a=outloop, b=in, sel=load, out=muxout);
-    DFF(in=muxout, out=out, out=outloop);
-
-    
+    Mux(a=feedback, b=in, sel=load, out=next);
+    DFF(in=next, out=out, out=feedback);
 }
